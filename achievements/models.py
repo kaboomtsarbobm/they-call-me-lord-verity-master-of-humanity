@@ -8,10 +8,10 @@ class Achievement(models.Model):
     UNIQUE_BALLS = "unique_balls"
 
     REQUIREMENT_TYPES = (
-        (MANUAL, "Manual"),
-        (CATCH_BALLS, "catch balls"),
-        (SPECIFIC_BALLS, "catch balls but you specify them"),
-        (UNIQUE_BALLS, "catch different balls"),
+        (MANUAL, "(dont use this)"),
+        (CATCH_BALLS, "Catch a number of balls."),
+        (SPECIFIC_BALLS, "Catch a number of a specified ball(s)."),
+        (UNIQUE_BALLS, "Catch a number of unique balls."),
     )
 
     title = models.CharField(max_length=100)
