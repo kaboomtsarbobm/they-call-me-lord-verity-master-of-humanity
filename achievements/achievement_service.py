@@ -1,3 +1,4 @@
+import discord
 from asgiref.sync import sync_to_async
 
 from bd_models.models import BallInstance, Player
@@ -24,7 +25,7 @@ async def get_currency_name():
     return "currency"
 
 
-async def check_achievements(player, interaction):
+async def check_achievements(player, interaction=None, bot=None, channel=None):
     currency_name = await get_currency_name()
     achievements = await sync_to_async(list)(
         Achievement.objects.filter(
@@ -125,11 +126,30 @@ async def check_achievements(player, interaction):
 
         reward_message = "\n".join(reward_text)
 
+        notification = (
+            f"**Acheivement Complete!**\n\n"
+            f"**{achievement.title}**\n\n"
+            f"**Rewards Given:**\n"
+            f"{reward_message or 'No reward configured.'}"
+        )
+
         if interaction:
             await interaction.followup.send(
-                f"**FREE SURVEY COMPLETE**\n\n"
-                f"**{achievement.title}**\n\n"
-                f"**Random Shit Given:**\n"
-                f"{reward_message or 'No reward configured.'}",
+                notification,
                 ephemeral=True,
             )
+        elif channel is not None:
+            try:
+                await channel.send(notification)
+            except (discord.Forbidden, discord.HTTPException, discord.NotFound):
+                # Rewards and completion are already recorded; a channel send
+                # failure should not undo the achievement.
+                pass
+        elif bot is not None:
+            try:
+                user = await bot.fetch_user(player.discord_id)
+                await user.send(notification)
+            except (discord.Forbidden, discord.HTTPException, discord.NotFound):
+                # Rewards and completion are already recorded; a closed DM should
+                # not undo the achievement.
+                pass
