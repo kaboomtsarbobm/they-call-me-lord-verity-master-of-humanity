@@ -70,7 +70,7 @@ class AchievementCog(commands.Cog):
 
     @app_commands.command(
         name="achievements",
-        description="i want reward for progressing in the dex.",
+        description="See your achievements!",
     )
     async def achievements(self, interaction: discord.Interaction):
         from .models import Achievement, AchievementCompletion
